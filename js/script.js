@@ -1,16 +1,54 @@
+function getPageSource() {
+    function DOMtoString(document_root) {
+        var html = '',
+            node = document_root.firstChild;
+        while (node) {
+            switch (node.nodeType) {
+                case Node.ELEMENT_NODE:
+                    html += node.outerHTML;
+                    break;
+                case Node.TEXT_NODE:
+                    html += node.nodeValue;
+                    break;
+                case Node.CDATA_SECTION_NODE:
+                    html += '<![CDATA[' + node.nodeValue + ']]>';
+                    break;
+                case Node.COMMENT_NODE:
+                    html += '<!--' + node.nodeValue + '-->';
+                    break;
+                case Node.DOCUMENT_TYPE_NODE:
+                    // (X)HTML documents are identified by public identifiers
+                    html += "<!DOCTYPE " + node.name + (node.publicId ? ' PUBLIC "' + node.publicId + '"' : '') + (!node.publicId && node.systemId ? ' SYSTEM' : '') + (node.systemId ? ' "' + node.systemId + '"' : '') + '>\n';
+                    break;
+            }
+            node = node.nextSibling;
+        }
+        return html;
+    }
+
+    chrome.runtime.sendMessage({
+        action: "getSource",
+        source: DOMtoString(document)
+    });
+}
+
 chrome.tabs.query({ 'active': true }, function(tabs) {
-    var url = tabs[0].url;
-    if (!url.startsWith("chrome://") && !url.startsWith("edge://")) {
-        fetch(url).then(e => {
-            e.text().then(e => {
-                if (e.toLowerCase().includes("garfield")) {
-                    document.getElementById("garField").src = "https://png.pngitem.com/pimgs/s/146-1460943_garfield-png-free-images-cartoon-garfield-cat-transparent.png";
-                    document.getElementById("garText").hidden = true
-                } else {
-                    document.getElementById("garField").src = "https://png.pngitem.com/pimgs/s/146-1461249_garfield-sticker-line-transparent-hd-png-download.png";
-                    document.getElementById("garText").hidden = true
-                }
-            })
-        })
+    tabId = tabs[0].id;
+    console.log(tabId)
+    chrome.scripting.executeScript({
+        target: { tabId: tabId },
+        func: getPageSource
+    });
+});
+
+chrome.runtime.onMessage.addListener(function(request, sender) {
+    if (request.action == "getSource") {
+        if (request.source.toLowerCase().includes("garfield")) {
+            document.getElementById("garField").src = "https://png.pngitem.com/pimgs/s/146-1460943_garfield-png-free-images-cartoon-garfield-cat-transparent.png";
+            document.getElementById("garText").hidden = true
+        } else {
+            document.getElementById("garField").src = "https://png.pngitem.com/pimgs/s/146-1461249_garfield-sticker-line-transparent-hd-png-download.png";
+            document.getElementById("garText").hidden = true
+        }
     }
 });
