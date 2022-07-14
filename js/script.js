@@ -44,10 +44,12 @@ chrome.tabs.query({ 'active': true }, function(tabs) {
 chrome.runtime.onMessage.addListener(function(request, sender) {
     if (request.action == "getSource") {
         if (request.source.toLowerCase().includes("garfield")) {
-            document.getElementById("garField").src = "https://png.pngitem.com/pimgs/s/146-1460943_garfield-png-free-images-cartoon-garfield-cat-transparent.png";
+            document.getElementById("garField").src = "imgs/garfield.png";
+            document.getElementById("garField").style.width = "200px";
             document.getElementById("garText").hidden = true
         } else {
-            document.getElementById("garField").src = "https://png.pngitem.com/pimgs/s/146-1461249_garfield-sticker-line-transparent-hd-png-download.png";
+            document.getElementById("garField").src = "imgs/garfieldnt.png";
+            document.getElementById("garField").style.width = "200px";
             document.getElementById("garText").hidden = true
         }
     }
